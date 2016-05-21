@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 
+export Host="xxxx.xxxx.xxxx.xxxx"
 export Port="Port Ouvert Pour la Box"
 export User="UtilisateurConnecte"
 export IdentityFile="$HOME/.ssh/id_dsa"
