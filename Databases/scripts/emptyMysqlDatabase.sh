@@ -28,10 +28,10 @@ MYSQL=$(which mysql)
 AWK=$(which awk)
 GREP=$(which grep)
  
-TABLES=$($MYSQL -u $MUSER -p$MPASS -h$HOST $MDB -e 'show tables' | $AWK '{ print $1}' | $GREP -v '^Tables' )
+TABLES=$($MYSQL -u$MUSER -p$MPASS -h$HOST $MDB -e 'show tables' | $AWK '{ print $1}' | $GREP -v '^Tables' )
  
 for t in $TABLES
 do
 	echo "Deleting $t table from $MDB database..."
-	$MYSQL -u $MUSER -p$MPASS $MDB -e "drop table $t"
+	$MYSQL -u$MUSER -p$MPASS $MDB -h$HOST -e "drop table $t"
 done
