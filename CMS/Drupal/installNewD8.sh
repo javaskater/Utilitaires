@@ -71,7 +71,7 @@ main(){
 	fi
 	
 	trace " + then install the ${SITENAME} with locale ${LOCALE}"
-	drush site-install standard --db-url="mysql://${MUSER}:${MPASS}@${HOST}/${MDB}" –site-name="${SITENAME}"  --account-name="${ADMINUSER}" --account-pass="${ADMINPASSWD}" –account-mail="${ADMINMAIL}" -r "${PHPPROJECT}" --locale="${LOCALE}" -y 2>&1
+	$DRUSH site-install standard --db-url="mysql://${MUSER}:${MPASS}@${HOST}/${MDB}" --site-name="${SITENAME}"  --account-name="${ADMINUSER}" --account-pass="${ADMINPASSWD}" –account-mail="${ADMINMAIL}" -r "${PHPPROJECT}" --locale="${LOCALE}" -y 2>&1
 	if [ $? -eq 0 ]; then
 		trace " - Installation of ${SITENAME} : OK"
 	else
@@ -88,6 +88,16 @@ main(){
 		exit 1
 	fi
 	trace " End of the installation ..."
+	trace " Making a Backup of the freshly installed Drupal 8 WebSite ..."
+	BACKUPFILE="${PHPPROJECT}_${LOCALE}_$(date +%Y%m%d_%H%M%S).tar"
+	$DRUSH --root=${PHPPROJECT} ard --destination=${BACKUPFILE} 2>&1
+	if [ $? -eq 0 ]; then
+		trace " - result of Backup : OK (the path for the BackupFile is ${BACKUPFILE}"
+	else
+		trace " - result of Backup : KO (see ${LOGFILE})"
+		exit 1
+	fi
+	
 }
 
 
