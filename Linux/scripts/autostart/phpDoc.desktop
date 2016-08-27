@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Terminal=true
+Name=Android-Docs
+Icon=/home/jpmena/RIF/Utilitaires/Linux/scripts/autostart/icon/php-logo.eps
+Exec=/bin/bash "/home/jpmena/RIF/Utilitaires/Linux/scripts/autostart/readPdfs.sh" "/home/jpmena/Documents/Livres/OReilly/Modern_PHP.pdf-/home/jpmena/Documents/Livres/OReilly/Learning_PHP.pdf"
+Categories=GNOME;GTK;Utility;
+StartupNotify=true

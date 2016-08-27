@@ -38,3 +38,16 @@ Exec=/home/jpmena/RIF/Uusilitaires/Linux/scripts/autostart/readPdfs.sh
 Categories=GNOME;GTK;Utility
 StartupNotify=true
 ```
+
+# How to handle  desktop shortcuts!
+
+## see [Ubuntu Help](https://help.ubuntu.com/community/UnityLaunchersAndDesktopFiles)
+* It recommends the [desktop-file-validate tool]() which explains in my case:
+
+``` bash
+jpmena@jpmena-P34:~/RIF/Utilitaires/Linux/scripts/autostart$ desktop-file-validate phpDoc.desktop
+phpDoc.desktop: error: value "/home/jpmena/RIF/Uusilitaires/Linux/scripts/autostart/readPdfs.sh /home/jpmena/Documents/Livres/OReilly/Modern_PHP.pdf;/home/jpmena/Documents/Livres/OReilly/Learning_PHP.pdf" for key "Exec" in group "Desktop Entry" contains a reserved character ';' outside of a quote
+phpDoc.desktop: error: value "GNOME;GTK;Utility" for string list key "Categories" in group "Desktop Entry" does not have a semicolon (';') as trailing character
+```
+
+## an interesting desktop generation [WIKI Archilinx ](https://wiki.archlinux.org/index.php/Desktop_entries)

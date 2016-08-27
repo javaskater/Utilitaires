@@ -13,24 +13,26 @@ trace(){
 if [ "$#" -eq 1 ]
 then
 	IN=$1
-	
+
 	#trace "we have to open $IN"
+elif [ "$#" -eq 0 ]
+then
+	IN=/home/jpmena/Documents/Livres/Informit/9780134401966.pdf-/home/jpmena/Documents/Livres/Informit/9780134171494.pdf
 else
-	IN="/home/jpmena/Documents/Livres/Informit/9780134401966.pdf;/home/jpmena/Documents/Livres/Informit/9780134171494.pdf"
-	#trace "Illegal number of parameters found $# parameters, should be 1"
-	#trace "Usage: $0 {pdf abs path 1};{pdf abs path 2};...."
-	#trace "opens the specified pdf documents (script for startup) ????"
-	#trace "the argument is a list of absolute pdf pathes, each path is separated from the next by ';'"
-	exit 1
+	trace "Illegal number of parameters found $# parameters, should be 0 or 1"
+	trace "Usage: $0 {pdf abs path 1}-{pdf abs path 2};...."
+	trace "opens the specified pdf documents (script for startup) ????"
+	trace "the argument is a list of absolute pdf pathes, each path is separated from the next by '-'"
 fi
 
-PDFFILES=$(echo $IN | tr ";" "\n")
+PDFFILES=$(echo $IN | tr "-" "\n")
+#trace $PDFFILES
 # Detect paths
 PDFREADER=$(which evince)
 
 # the & symbol is mandatory otherwise only a pdf would open and the startup process would block !!!!
 main(){
-	for arg in $PDFFILES #if you replace with "$PDFFILES" it takes as a unique arg !!! problem 
+	for arg in $PDFFILES #if you replace with "$PDFFILES" it takes as a unique arg !!! problem
 	do
 		if [ -e "$arg" ]
 		then
@@ -49,7 +51,7 @@ main(){
 }
 
 mainargs(){
-	for arg in $PDFFILES #if you replace with "$PDFFILES" it takes as a unique arg !!! problem 
+	for arg in $PDFFILES #if you replace with "$PDFFILES" it takes as a unique arg !!! problem
 	do
 		if [ -e "$arg" ]
 		then
