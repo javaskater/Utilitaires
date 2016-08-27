@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Terminal=true
+Name=Android-Docs
+Icon=/home/jpmena/RIF/Utilitaires/Linux/scripts/autostart/icon/00-android-4-0_icons.png
+Exec=/home/jpmena/RIF/Uusilitaires/Linux/scripts/autostart/readPdfs.sh
+Categories=GNOME;GTK;Utility
+StartupNotify=true
