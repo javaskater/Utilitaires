@@ -1,3 +1,9 @@
+## Ressources :
+
+* I explained in French how to install Drush on 1AND1 [My WIKI In French About Drush and 1AND1](http://wiki.jpmena.eu/index.php?title=Php:drupal8:hebergeurs#1AND1_Mutualis.C3.A9)
+
+* I explained the commaand to be passed to import Randonnée de Journée after the _rif_imports_ module had been installed and activated on [My GitHub rif-imports project](https://github.com/javaskater/rif_imports)
+
 ## _drushImpostRj.sh_ the Script's Result :
 
 ``` bash
