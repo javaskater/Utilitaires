@@ -3,7 +3,7 @@
 ## demander l'aide :
 
 * pour cela appeler le script sans aucun paramètre :
-  * le script appelle alors sa méthode _usage _...
+  * le script appelle alors sa méthode _usage_ ...
 
 ``` bash
 jpmena@jpmena-P34 ~/RIF/Utilitaires/Linux/OVH (master=) $ ./logOvh.sh
@@ -28,6 +28,8 @@ Récupère les fichiers de Logs d'u type donné pour un domaine donné et un moi
 
 ### Récupérer les Logs d'erreur APACHE pour le domaine rifrando.asso.fr sur OVH :
 
+#### Les paramètres à passer (dans l'ordre) :
+
 * Ce qui donne d'après la sortie _usage_ précédente:
   * {URL Site} : __rifrando.asso.fr__
   * {Mois récupéré} : __08_2016__ pour le mois d'août 2016 !!!!
@@ -40,8 +42,10 @@ Récupère les fichiers de Logs d'u type donné pour un domaine donné et un moi
     * __out__ : on récupère les logs des acccès TCP sur l'hébergement OVH pour le domaine  _rifrando.asso.fr_ - à précciser !!!!
     * __cron__ : on récupère les logs des des tâches planifiées qui ont été déclenchées sur l'hébergement OVH pour le domaine  _rifrando.asso.fr_
 
+#### On passe la commande :
+
 ``` bash
-jpmena@jpmena-P34 ~/RIF/Utilitaires/Linux/OVH (master *=) $ ./logOvh.sh rifrando.asso.fr 08-2016 developpeur allezleRIF1976 error
+jpmena@jpmena-P34 ~/RIF/Utilitaires/Linux/OVH (master *=) $ ./logOvh.sh rifrando.asso.fr 08-2016 xxxIdentifiantLogsxx xxxMotDePasseLogsxx error
 2016/09/02-08:55:23 - La sortie console ssera aussi dans : /home/jpmena/rifrando.asso.fr/error/08-2016/logOvh.sh_20160902_085523.log
 2016/09/02-08:55:23 - Création du dossier /home/jpmena/rifrando.asso.fr/error/08-2016
 2016/09/02-08:55:23 - Téléchargement des logs...
