@@ -5,6 +5,12 @@
 # Usage :	./script-name.sh domaine mm-aaaa
 # ex : 		./script-name.sh rifrando.asso.fr 08-2016 logusername loguserpassword error
 
+trace(){
+	msg=$1
+	timestamp=$(date +%Y/%m/%d-%H:%M:%S)
+	echo "$timestamp - $msg"
+}
+
 usage(){
 	echo "Le nombre de parramètres doit être 4 ou 5"
 	echo "Usage: $0 {URL Site} {Mois récupéré} {Logs User Name} {Logs User Password} {type de logs}"
@@ -56,17 +62,11 @@ if [ -z "$TYPE" ]
 then
 	TYPE=web
 fi
-# Répertoire de destination. 
+# Répertoire de destination.
 DOSSIER=$HOME/$SITE/$TYPE/$PERIODE
 LOGDIR=$DOSSIER
 LOGFILE=$LOGDIR/$(basename $0)_$(date +%Y%m%d_%H%M%S).log
-tracce "La sortie console ssera aussi dans : $LOGFILE"
-
-trace(){
-	msg=$1
-	timestamp=$(date +%Y/%m/%d-%H:%M:%S)
-	echo "$timestamp - $msg"
-}
+trace "La sortie console ssera aussi dans : $LOGFILE"
 
 
 main(){
