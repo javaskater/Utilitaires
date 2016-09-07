@@ -80,7 +80,7 @@ main(){
 	fi
 	DEFAULT_DIR=${PHPPROJECT}/sites/default
 	trace " + changing rights at ${DEFAULT_DIR} for the cache"
-	chown -R ${LOCALUSER}:${APACHEGROUP} ${DEFAULT_DIR} 2>&1
+	sudo chown -R ${LOCALUSER}:${APACHEGROUP} ${DEFAULT_DIR} 2>&1
 	if [ $? -eq 0 ]; then
 		trace " - changing rights at ${DEFAULT_DIR} : OK"
 	else
