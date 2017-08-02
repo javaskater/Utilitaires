@@ -37,13 +37,13 @@ PROXY="http://monproxy:monport"
 #le drush installer supprime lui même la base si elle existe ...
 ## ce paramètre permet notamment de la créer si elle n'exite pas
 ## la base portera le nom de la racine Drupal (ici d8postedev même nom pour l'utilisateur) 
-INSTALL_DATABASE="True"
+INSTALL_DATABASE="False"
 
 PG_DATABASE=$DRU_INSTANCE
 
 DIR=${PWD%/}
 DAT=$(date +%Y%m%d_%H%M%S)
-FLOG=$DIR/${DRU_NAME}-$DAT.log
+FLOG=$DIR/${DRU_INSTANCE}-$DAT.log
 
 #for aliases definiton we need...
 
@@ -88,7 +88,7 @@ function kernel(){
     echo "We install the latest Drupal8 sources unser ${DRU_SOURCES_DIR} unsig composer"
     sudo rm -rf $DRU_SOURCES_DIR
     cd $DRU_INSTALL_DIR
-    local_composer create-project drupal-composer/drupal-project:8.x-dev $DRU_HOME --stability dev --no-interaction 2>&1
+    local_composer create-project drupal-composer/drupal-project:8.x-dev $DRU_INSTANCE --stability dev --no-interaction 2>&1
     echo "we now launch Drupal automatic installation using the local drush present in the vendor directory"
     #you have to be under DRUPAL root to launch our drush commands
     cd $DRU_HOME
@@ -109,17 +109,21 @@ function complementary_modules(){
    MEDIA_ENTITY_DRUSH="media_entity_image"
    MEDIA_ENTITY_COMPOSER="drupal/${MEDIA_ENTITY_DRUSH}"
    
+   old_dir=$(pwd) 
    
    #composer.json (created by the composer download of drupal sources), is present at $DRU_SOURCES_DIR 
    ##we need to change directory there to complement it with our required complmentary modules ...
    cd "$DRU_SOURCES_DIR"
    echo "+ we need $MEDIA_ENTITY_COMPOSER (we download it using composer)"
+   echo "we are at: $(pwd)"
    local_composer require $MEDIA_ENTITY_COMPOSER 2>&1
    
    #you have to be under DRUPAL root to launch our drush commands
    cd "${DRU_HOME}"
    echo "+ we activate $MEDIA_ENTITY_DRUSH (and its dependencies)"
    local_drush en -y $MEDIA_ENTITY_DRUSH 2>&1
+
+   cd $old_dir
 }
 
 function developper_modules(){
@@ -153,6 +157,9 @@ function developper_modules(){
    
    #composer.json (created by the composer download of drupal sources), is present at $DRU_SOURCES_DIR 
    ##we need to change directory there to complement it with our required complmentary modules...
+
+   old_dir=$(pwd) 
+
    cd "$DRU_SOURCES_DIR"
    
    echo "+ we need $CONFIG_INSPECT_COMPOSER (we download it using composer)"
@@ -187,20 +194,25 @@ function developper_modules(){
 
    echo "+ we activate $MASQUERADE_DRUSH (and its dependencies)"
    local_drush en -y $MASQUERADE_DRUSH 2>&1
+
+   cd $old_dir
 }
 
 function personal_devs(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
+    
     old_dir=$(pwd)
+    
     IMPORT_MODULE="rif_imports"
     GIT_IMPORT_MODULE="https://github.com/javaskater/${IMPORT_MODULE}.git"
     echo "+ we clone $GIT_IMPORT_MODULE into $DRU_PERSONAL_MODULES"
-    cd $DRU_PERSONAL_MODULES
-    git clone $GIT_IMPORT_MODULE
+    mkdir $DRU_PERSONAL_MODULES && cd $DRU_PERSONAL_MODULES
+    git clone $GIT_IMPORT_MODULE 2>&1
     echo "+ we activate $IMPORT_MODULE and its dependencies (configuration modules)"
     #you have to be under DRUPAL root to launch our drush commands
     cd "$DRU_HOME"
-    local_drush en -y $IMPORT_MODULE
+    local_drush en -y $IMPORT_MODULE 2>&1
+    
     cd $old_dir
 
 }
@@ -232,7 +244,7 @@ function main(){
     if [ $INSTALL_DATABASE == "True" ]; then
         postgres_database_creation
     fi
-    kernel_install
+    kernel
     complementary_modules
     developper_modules
     personal_devs
