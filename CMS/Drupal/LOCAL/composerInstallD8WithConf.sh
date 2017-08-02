@@ -204,6 +204,16 @@ function personal_devs(){
     old_dir=$(pwd)
     
     IMPORT_MODULE="rif_imports"
+
+    #my module need the following  one that I have to download via composer before enabling the whole
+    DELETE_ALL_DRUSH="delete_all"
+    DELETE_ALL_COMPOSER="drupal/${DELETE_ALL_DRUSH}"
+
+    cd "$DRU_SOURCES_DIR"
+   
+    echo "+ we need ${DELETE_ALL_DRUSH} (we download it using composer)"
+    local_composer require $DELETE_ALL_COMPOSER 2>&1
+
     GIT_IMPORT_MODULE="https://github.com/javaskater/${IMPORT_MODULE}.git"
     echo "+ we clone $GIT_IMPORT_MODULE into $DRU_PERSONAL_MODULES"
     mkdir $DRU_PERSONAL_MODULES && cd $DRU_PERSONAL_MODULES
