@@ -128,26 +128,26 @@ function developper_modules(){
    #We have to download module code using composer, because Drupal's kernel itself has been downloaded using composer
    
 
-   #module de lecture de données de configuration
+   #Getting the active configuration key-values pairs on your admin dasboard
    CONFIG_INSPECT_DRUSH="config_inspector"
    CONFIG_INSPECT_COMPOSER="drupal/${CONFIG_INSPECT_DRUSH}"
 
 
-   #module de lecture de données de configuration
+   #changing user without having to logout and login again
    MASQUERADE_DRUSH="masquerade"
    MASQUERADE_COMPOSER="drupal/${MASQUERADE_DRUSH}"
    
-   #Suite d'outils pous les développeurs, 
+   #Developpers' tools suite ...
    DEVEL_DRUSH="devel"
    DEVEL_COMPOSER="drupal/${DEVEL_DRUSH}"
-   ##nous utiliserons  DEVEL_GENERATE pour l'ajout de données
+   ##We will use  DEVEL_GENERATE from the suite for automatically generating content of any content type
    DEVEL_GENERATE_DRUSH="devel_generate"
-   ##nous utiliserons le module inclu KINT pour le débohgage Twig
+   ##We will use  DEVEL_GENERATE from the suite for graphically twig debugging using the 'kint($my_variable);' command
    DEVEL_KINT_DRUSH="kint"
-   ##nous utiliserons le module inclu WEPROFILER (Barre d'outil au bas de l'écran d'aministrateur Drupal à l'image de la barre Symfony app_dev.php)
+   ##We will use  WEPROFILER from the suite to get a developper's ToolBar at the bottom of the screen, analogous to the  Symfony app_dev.php toolbar
    DEVEL_WEBPROFILER_DRUSH="webprofiler"
 
-   #les exemples de modules sur lesquels Mikaël s'appuie pour son stage sont un projet Drupal
+   #We will use EXAMPLES from the suite to get a Suite of well written modules (each modules does only one thing and does it well)
    EXAMPLES_DRUSH="examples"
    EXAMPLES_COMPOSER="drupal/${EXAMPLES_DRUSH}"
    
@@ -213,9 +213,9 @@ function tunings(){
     echo "/* " >> $SETTINGS_FILE
     echo "* paramètres ajoutés par la fonction ${FUNCNAME[0]} du script $0" >> $SETTINGS_FILE
     echo "*/" >> $SETTINGS_FILE
-    #on met à jour le chemin d'accès aux pièces jointes cf. bas de https://www.drupal.org/node/2392959
+    #We don't want our attached file be in the public directory by default see  de https://www.drupal.org/node/2392959 (bottom of the webpage)
     echo "\$settings['file_private_path'] = '${PRIVATE_FILE_IMAGE_PATH}';" >> $SETTINGS_FILE
-    #on ajoute le proxy DGFIP à notre installation ....
+    #If Drupal has to access internet through a proxy server, wee need to add its address here ....
     echo "\$settings['http_client_config']['proxy']['http'] = '${PROXY}';" >> $SETTINGS_FILE
     echo "\$settings['http_client_config']['proxy']['https'] = '${PROXY}';" >> $SETTINGS_FILE
     echo "\$settings['http_client_config']['proxy']['no'] = ['127.0.0.1', 'localhost', '*.dgfip'];" >> $SETTINGS_FILE
