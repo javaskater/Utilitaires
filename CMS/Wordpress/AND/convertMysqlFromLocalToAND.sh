@@ -1,6 +1,6 @@
 #!/bin/bash
 
-DIR_DUMPS="${HOME}/CONSULTANT/wordpress"
+DIR_DUMPS="${HOME}/Consultant/wordpress"
 LOCAL_MYSQL_DUMP="blogjpmena.sql"
 REMOTE_MYSQL_DUMP="blogand.sql"
 TMP_MYSQL_DUMP="tmp_${REMOTE_MYSQL_DUMP}"
@@ -30,19 +30,19 @@ LOGFILE=$LOGDIR/$(basename $0)_$(date +%Y%m%d_%H%M%S).log
 ##
 function convert_encodings(){
    trace "DOING $0 / ${FUNCNAME[0]}"
-	sed -re 's/utf8mb4_unicode_520_ci/utf8mb4_general_ci/g' $1 > $2
+	sed -re "s/${COLLATE_LOCAL}/${COLLATE_AND}/g" $1 > $2
 }
 
 function change_url_home(){
    trace "DOING $0 / ${FUNCNAME[0]}"
-	sed -re 's/blogjpmena.and/blog.jpmena.eu/g' $1 > $2
+	sed -re "s/${URL_LOCAL}/${URL_AND}/g" $1 > $2
 }
 
 
 main(){
 	old_pwd=$(pwd)
 	cd $DIR_DUMPS
-	
+
 	convert_encodings "${LOCAL_MYSQL_DUMP}" "${TMP_MYSQL_DUMP}"
 	change_url_home "${TMP_MYSQL_DUMP}" "${REMOTE_MYSQL_DUMP}"
 	rm -f "${REMOTE_MYSQL_DUMP}.gz"
