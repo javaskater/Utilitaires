@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-export ORIG_BASE=$HOME/Images/RSM
-export ARCHIVE_BASE=$HOME/RSM
-export base_name=6HParis2016Selection
+export ORIG_BASE=$HOME/Images/BretagneEte2017
+export ARCHIVE_BASE=$HOME/Public
+export base_name=Selection1307
 if [ -d ${ARCHIVE_BASE}/${base_name} ]; then
   	echo "suppression ${ARCHIVE_BASE}/${base_name}"
 	#* pour supprimer aussi l'archive !!!
