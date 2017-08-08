@@ -49,7 +49,7 @@ def organise_fichiers(rep_source,rep_dest):
     return sorted(liste_fichiers_tries, key=lambda lecon: lecon.num)
 
 if __name__ == '__main__':
-    lecons_triees=organise_fichiers("/home/jpmena/Music/RUSSECD1/HARRAPS/Russe CD1","/media/jpmena/ARCHOS/LANGUES/RUSSE/CD1")
+    lecons_triees=organise_fichiers("/home/jpmena/Musique/MusiqueLiliane/Harpe","/media/jpmena/ARCHOS/MUSIC/Harpe")
     for l in lecons_triees:
         print "Leçon no:{n} vaut:{lecon}\n".format(n=l.num,lecon=l)
         retour=l.transforme_fichier(["ffmpeg", "-i"])
