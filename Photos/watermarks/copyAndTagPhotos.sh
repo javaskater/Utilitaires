@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
-export ORIG="${HOME}/Images/CDRS/6HParis/PATI"
-export DEST="${HOME}/Images/CDRS/6HParis/PATI_TAG"
+export CAT="CDRS"
+export ORIG="${HOME}/Images/CDRS/6HParis/$CAT"
+export DEST="${HOME}/Images/CDRS/6HParisExport/$CAT" #for sharing on DropBox or Drive
 
 export TAG_FILE="$(pwd)/jpmena.png"
 
