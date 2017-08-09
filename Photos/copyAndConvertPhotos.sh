@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 export CAT="CDRS"
-export ORIG="${HOME}/Images/CDRS/6HParisExport/$CAT" #for sharing on DropBox or Drive
+export ORIG="${HOME}/Images/CDRS/6HParisExport/${CAT}_SHARE" #for sharing on DropBox or Drive
 export DEST="${HOME}/Images/CDRS/6HParisExport/${CAT}_WEB" #for importing in Google Photos
 
 

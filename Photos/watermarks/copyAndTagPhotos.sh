@@ -2,7 +2,7 @@
 
 export CAT="CDRS"
 export ORIG="${HOME}/Images/CDRS/6HParis/$CAT"
-export DEST="${HOME}/Images/CDRS/6HParisExport/$CAT" #for sharing on DropBox or Drive
+export DEST="${HOME}/Images/CDRS/6HParisExport/${CAT}_SHARE" #for sharing on DropBox or Drive
 
 export TAG_FILE="$(pwd)/jpmena.png"
 
