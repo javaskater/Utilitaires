@@ -1,11 +1,14 @@
 #!/usr/bin/env bash
 
+#The drush drupal8 installer drops by himself the database if exists
+## Anyway if we need to create ti from scratch, just put true to the following variable
+INSTALL_DATABASE="True"
 
 # On http://docs.drush.org/en/master/install/ they note that:
-## Drush 9 (coming soon!) only supports one install method. 
-## It will require that your Drupal site be built with Composer 
+## Drush 9 (coming soon!) only supports one install method.
+## It will require that your Drupal site be built with Composer
 ## ( which is for the coming Drupal8 releases the preferred method ... )
-### and Drush be listed as a dependency. 
+### and Drush be listed as a dependency.
 
 ## that script's directory ...
 SCRIPT_DIR=$(pwd)
@@ -33,17 +36,12 @@ PRIVATE_FILE_IMAGE_PATH="$HOME/Images/RIF"
 ##le proxy DGFIP qui permet à Drupal d'accéder à internet (mises à jour, installation de modules par l'interface graphique ?)
 PROXY="http://monproxy:monport"
 
-
-#le drush installer supprime lui même la base si elle existe ...
-## ce paramètre permet notamment de la créer si elle n'exite pas
-## la base portera le nom de la racine Drupal (ici d8postedev même nom pour l'utilisateur) 
-INSTALL_DATABASE="False"
-
-PG_DATABASE=$DRU_INSTANCE
+MYSQL_DATABASE=$DRU_INSTANCE
 
 DIR=${PWD%/}
 DAT=$(date +%Y%m%d_%H%M%S)
 FLOG=$DIR/${DRU_INSTANCE}-$DAT.log
+DRUPAL_ARCHIVE=${DRU_INSTALL_DIR}/"${DRU_INSTANCE}-${DAT}.tar"
 
 #for aliases definiton we need...
 
@@ -63,27 +61,18 @@ alias local_composer="php $HOME/composer.phar"
 alias local_drush="php ../vendor/drush/drush/drush.php"
 
 
-function postgres_database_creation(){
+function mysql_database_creation(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
-    if sudo -u postgres psql -lqt | cut -d \| -f 1 | grep -iw $PG_DATABASE; then
-        echo "The Database $PG_DATABASE does exist, we suppress it before creating it again..."
-        echo "- we suppress the $PG_DATABASE database"
-        sudo -u postgres dropdb $PG_DATABASE 2>&1
-        echo "- we suppress the $PG_DATABASE user"
-        sudo -u postgres dropuser $PG_DATABASE 2>&1
-        echo "- after having deleted it, we create ${PG_DATABASE} again!"
-    else
-        echo "The Database $PG_DATABASE does not exist, we just create it, along with its associated user"
-    fi
-    #We create a Postgres User with password same as name!
-    sudo -u postgres psql -c "CREATE USER $PG_DATABASE WITH PASSWORD '$PG_DATABASE';" 2>&1
-    #We now create the database having the same name as the user just created
-    sudo -u postgres createdb -O $PG_DATABASE $PG_DATABASE 2>&1
+mysql -uroot -proot -h localhost  2>&1 <<EOF
+CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE} CHARACTER SET utf8 COLLATE utf8_general_ci;
+GRANT ALL ON \`${MYSQL_DATABASE}\`.* TO \`${MYSQL_DATABASE}\`@localhost IDENTIFIED BY '${MYSQL_DATABASE}';
+EOF
+    resmysql=$?
 }
 
 function kernel(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
-    old_dir=$(pwd) 
+    old_dir=$(pwd)
 
     echo "We install the latest Drupal8 sources unser ${DRU_SOURCES_DIR} unsig composer"
     sudo rm -rf $DRU_SOURCES_DIR
@@ -96,28 +85,28 @@ function kernel(){
     ## that command drop the existing Drupal Tables in the Database if necessary  !!!!
     ## Here we chose the standard profile.
     ### the possible profiles match the directories' names present under $DRU_HOME/web/core/profiles
-    local_drush si -y --notify --db-url="pgsql://${PG_DATABASE}:${PG_DATABASE}@127.0.0.1:5432/${PG_DATABASE}" standard --site-name="$SITE_NAME" --account-pass="$ADMIN_PASSWD" 2>&1
-    
+    local_drush si -y --notify --db-url="mysql://${MYSQL_DATABASE}:${MYSQL_DATABASE}@127.0.0.1:3306/${MYSQL_DATABASE}" standard --site-name="$SITE_NAME" --account-pass="$ADMIN_PASSWD" 2>&1
+
     cd $old_dir
 }
 
 function complementary_modules(){
    echo "calling the  $0 / ${FUNCNAME[0]} function"
-   
+
    #We have to download module code using composer, because Drupal's kernel itself has been downloaded using composer
-   
+
    MEDIA_ENTITY_DRUSH="media_entity_image"
    MEDIA_ENTITY_COMPOSER="drupal/${MEDIA_ENTITY_DRUSH}"
-   
-   old_dir=$(pwd) 
-   
-   #composer.json (created by the composer download of drupal sources), is present at $DRU_SOURCES_DIR 
+
+   old_dir=$(pwd)
+
+   #composer.json (created by the composer download of drupal sources), is present at $DRU_SOURCES_DIR
    ##we need to change directory there to complement it with our required complmentary modules ...
    cd "$DRU_SOURCES_DIR"
    echo "+ we need $MEDIA_ENTITY_COMPOSER (we download it using composer)"
    echo "we are at: $(pwd)"
    local_composer require $MEDIA_ENTITY_COMPOSER 2>&1
-   
+
    #you have to be under DRUPAL root to launch our drush commands
    cd "${DRU_HOME}"
    echo "+ we activate $MEDIA_ENTITY_DRUSH (and its dependencies)"
@@ -128,9 +117,9 @@ function complementary_modules(){
 
 function developper_modules(){
    echo "calling the  $0 / ${FUNCNAME[0]} function"
-    
+
    #We have to download module code using composer, because Drupal's kernel itself has been downloaded using composer
-   
+
 
    #Getting the active configuration key-values pairs on your admin dasboard
    CONFIG_INSPECT_DRUSH="config_inspector"
@@ -140,7 +129,7 @@ function developper_modules(){
    #changing user without having to logout and login again
    MASQUERADE_DRUSH="masquerade"
    MASQUERADE_COMPOSER="drupal/${MASQUERADE_DRUSH}"
-   
+
    #Developpers' tools suite ...
    DEVEL_DRUSH="devel"
    DEVEL_COMPOSER="drupal/${DEVEL_DRUSH}"
@@ -154,14 +143,14 @@ function developper_modules(){
    #We will use EXAMPLES from the suite to get a Suite of well written modules (each modules does only one thing and does it well)
    EXAMPLES_DRUSH="examples"
    EXAMPLES_COMPOSER="drupal/${EXAMPLES_DRUSH}"
-   
-   #composer.json (created by the composer download of drupal sources), is present at $DRU_SOURCES_DIR 
+
+   #composer.json (created by the composer download of drupal sources), is present at $DRU_SOURCES_DIR
    ##we need to change directory there to complement it with our required complmentary modules...
 
-   old_dir=$(pwd) 
+   old_dir=$(pwd)
 
    cd "$DRU_SOURCES_DIR"
-   
+
    echo "+ we need $CONFIG_INSPECT_COMPOSER (we download it using composer)"
    local_composer require $CONFIG_INSPECT_COMPOSER 2>&1
 
@@ -173,19 +162,19 @@ function developper_modules(){
 
    echo "+ we need $MASQUERADE_COMPOSER (we download it using composer)"
    local_composer require $MASQUERADE_COMPOSER 2>&1
-   
+
    #you have to be under DRUPAL root to launch our drush commands
    cd "${DRU_HOME}"
-   
+
    echo "+ we activate $CONFIG_INSPECT_DRUSH (and its dependencies)"
    local_drush en -y $CONFIG_INSPECT_DRUSH 2>&1
-   
+
    echo "+ we activate $DEVEL_GENERATE_DRUSH (and its dependencies)"
    local_drush en -y $DEVEL_GENERATE_DRUSH 2>&1
-   
+
    echo "+ we activate $DEVEL_KINT_DRUSH (and its dependencies)"
    local_drush en -y $DEVEL_KINT_DRUSH 2>&1
-   
+
    echo "+ we activate $DEVEL_WEBPROFILER_DRUSH (and its dependencies)"
    local_drush en -y $DEVEL_WEBPROFILER_DRUSH 2>&1
 
@@ -200,9 +189,9 @@ function developper_modules(){
 
 function personal_devs(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
-    
+
     old_dir=$(pwd)
-    
+
     IMPORT_MODULE="rif_imports"
 
     #my module need the following  one that I have to download via composer before enabling the whole
@@ -210,7 +199,7 @@ function personal_devs(){
     DELETE_ALL_COMPOSER="drupal/${DELETE_ALL_DRUSH}"
 
     cd "$DRU_SOURCES_DIR"
-   
+
     echo "+ we need ${DELETE_ALL_DRUSH} (we download it using composer)"
     local_composer require $DELETE_ALL_COMPOSER 2>&1
 
@@ -222,7 +211,7 @@ function personal_devs(){
     #you have to be under DRUPAL root to launch our drush commands
     cd "$DRU_HOME"
     local_drush en -y $IMPORT_MODULE 2>&1
-    
+
     cd $old_dir
 
 }
@@ -245,14 +234,16 @@ function tunings(){
 }
 
 function backup_instance(){
-    echo "TODO $0 / ${FUNCNAME[0]}"
-     
+    echo "calling the $0 / ${FUNCNAME[0]}"
+    cd "$DRU_HOME"
+    local_drush arb --destination=$DRUPAL_ARCHIVE 2>&1
+
 }
 
 function main(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
     if [ $INSTALL_DATABASE == "True" ]; then
-        postgres_database_creation
+        mysql_database_creation
     fi
     kernel
     complementary_modules
@@ -261,5 +252,5 @@ function main(){
     #tunings
     backup_instance
 }
-        
-main | tee $FLOG 
+
+main | tee $FLOG
