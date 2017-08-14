@@ -12,6 +12,8 @@ INSTALL_DATABASE="True"
 
 ## that script's directory ...
 SCRIPT_DIR=$(pwd)
+USER=$(whoami)
+APACHE="www-data"
 
 #absolute path of Drupal's instance
 DRU_INSTALL_DIR="$HOME/RIF"
@@ -61,7 +63,12 @@ alias local_composer="php $HOME/composer.phar"
 
 #once Drupal will have been installed by composer, we have to define the following alias ...
 ## which can be used only when we are under $DRU_HOME
+##the local drush command
 alias local_drush="php ../vendor/drush/drush/drush.php"
+#une fois la console drupal installée localement par composer (partie vendor), on pourra passer la commande :
+## attention les commmandes de la console se passent depuis le répertoire des sources
+## et non depuis le sous-répertoire web !!!
+alias local_drupal="php vendor/drupal/console/bin/drupal.php"
 
 
 function mysql_database_creation(){
@@ -283,7 +290,10 @@ function display_drupal_available_console_commands(){
     cd "${DRU_HOME}"
     echo "1/ displaying the list of available drush commands:"
     local_drush help 2>&1
-    echo "2/ displaying the list of available drupal console commands:"
+    # attention les commmandes de la console se passent depuis le répertoire des sources
+    ## et non depuis le sous-répertoire web !!!
+    cd "${DRU_SOURCES_DIR}"
+    echo "2/ on affiche la liste des commandes proposées par la console Drupal:"
     local_drupal list 2>&1
 
     cd $old_dir
@@ -337,6 +347,9 @@ function main(){
     tunings
     display_drupal_available_console_commands
     backup_instance
+    sudo chown -R $USER:$APACHE $DRU_HOME 2>&1
+    sudo chmod -R g+w $DRU_HOME 2>&1
+    local_drush cr 2>&1
 }
 
 main | tee $FLOG
