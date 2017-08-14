@@ -2,7 +2,7 @@
 
 #The drush drupal8 installer drops by himself the database if exists
 ## Anyway if we need to create ti from scratch, just put true to the following variable
-INSTALL_DATABASE="True"
+INSTALL_DATABASE="False"
 
 # On http://docs.drush.org/en/master/install/ they note that:
 ## Drush 9 (coming soon!) only supports one install method.
@@ -20,6 +20,7 @@ DRU_INSTANCE="d8devextranet"
 DRU_SOURCES_DIR="${DRU_INSTALL_DIR}/${DRU_INSTANCE}"
 
 DRU_HOME="${DRU_SOURCES_DIR}/web"
+DRU_NAME=$(basename $DRU_SOURCES_DIR)
 
 DRU_COMPOSER_MODULES="${DRU_HOME}/modules/contrib"
 DRU_PERSONAL_MODULES="${DRU_HOME}/modules/custom"
@@ -36,12 +37,14 @@ PRIVATE_FILE_IMAGE_PATH="$HOME/Images/RIF"
 ##le proxy DGFIP qui permet à Drupal d'accéder à internet (mises à jour, installation de modules par l'interface graphique ?)
 PROXY="http://monproxy:monport"
 
+MYSQL_ROOT="root"
+MYSQL_ROOTPASSWD="root"
 MYSQL_DATABASE=$DRU_INSTANCE
 
 DIR=${PWD%/}
 DAT=$(date +%Y%m%d_%H%M%S)
 FLOG=$DIR/${DRU_INSTANCE}-$DAT.log
-DRUPAL_ARCHIVE=${DRU_INSTALL_DIR}/"${DRU_INSTANCE}-${DAT}.tar"
+DRUPAL_ARCHIVE=${DRU_INSTALL_DIR}/"${DRU_INSTANCE}-${DAT}"
 
 #for aliases definiton we need...
 
@@ -63,9 +66,12 @@ alias local_drush="php ../vendor/drush/drush/drush.php"
 
 function mysql_database_creation(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
-mysql -uroot -proot -h localhost  2>&1 <<EOF
+mysql -u${MYSQL_ROOT} -p${MYSQL_ROOTPASSWD} -h localhost  2>&1 <<EOF
+DROP DATABASE IF EXISTS ${MYSQL_DATABASE};
+DROP USER IF EXISTS ${MYSQL_DATABASE}@localhost;
+CREATE USER '${MYSQL_DATABASE}'@'localhost' IDENTIFIED BY '${MYSQL_DATABASE}';
 CREATE DATABASE IF NOT EXISTS ${MYSQL_DATABASE} CHARACTER SET utf8 COLLATE utf8_general_ci;
-GRANT ALL ON \`${MYSQL_DATABASE}\`.* TO \`${MYSQL_DATABASE}\`@localhost IDENTIFIED BY '${MYSQL_DATABASE}';
+GRANT ALL ON \`${MYSQL_DATABASE}\`.* TO \`${MYSQL_DATABASE}\`@localhost;
 EOF
     resmysql=$?
 }
@@ -235,8 +241,36 @@ function tunings(){
 
 function backup_instance(){
     echo "calling the $0 / ${FUNCNAME[0]}"
+    archive_name="$(basename $DRUPAL_ARCHIVE)"
+    archive_install_dir="$(dirname $DRUPAL_ARCHIVE)"
+    
+    old_dir=$(pwd)
     cd "$DRU_HOME"
-    local_drush arb --destination=$DRUPAL_ARCHIVE 2>&1
+    
+    drupal_code_dirname=$DRU_NAME
+    
+    echo "+ clean up cache before backuping"
+    local_drush cr 2>&1
+    
+    if [ -d "$DRUPAL_ARCHIVE" ]; then
+        rm -rf "$DRUPAL_ARCHIVE"
+    fi
+    mkdir -p "$DRUPAL_ARCHIVE"
+    cd "$DRUPAL_ARCHIVE"
+    echo "backupin Mysql Database: $MYSQL_DATABASE"
+    if mysql -u${MYSQL_ROOT} -p${MYSQL_ROOTPASSWD} -e 'show databases;' 2>/dev/null | grep -i ${MYSQL_DATABASE}; then
+        echo "Mysql Database $MYSQL_DATABASE exists, we can backup it"
+        mysqldump -u${MYSQL_ROOT} -p${MYSQL_ROOTPASSWD} ${MYSQL_DATABASE} -h localhost > "${MYSQL_DATABASE}.sql"
+    else
+        echo "Mysql Database $MYSQL_DATABASE does not exists, we cannot backup it. Giving up"
+        exit -1
+    fi
+    echo "Backuping Drupal8 Source Code ...."
+    cd $archive_install_dir
+    tar czf "${drupal_code_dirname}.tgz" $drupal_code_dirname && mv -v "${drupal_code_dirname}.tgz" $archive_name
+    echo "backuping  ${archive_install_dir} as ${archive_name}.tgz"
+    tar czf "${archive_name}.tgz" $archive_name -C "${archive_install_dir}" 2>&1
+    cd $old_dir
 
 }
 
@@ -245,10 +279,10 @@ function main(){
     if [ $INSTALL_DATABASE == "True" ]; then
         mysql_database_creation
     fi
-    kernel
-    complementary_modules
-    developper_modules
-    personal_devs
+    #kernel
+    #complementary_modules
+    #developper_modules
+    #personal_devs
     #tunings
     backup_instance
 }
