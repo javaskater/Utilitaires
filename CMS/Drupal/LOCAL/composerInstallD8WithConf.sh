@@ -2,7 +2,7 @@
 
 #The drush drupal8 installer drops by himself the database if exists
 ## Anyway if we need to create ti from scratch, just put true to the following variable
-INSTALL_DATABASE="False"
+INSTALL_DATABASE="True"
 
 # On http://docs.drush.org/en/master/install/ they note that:
 ## Drush 9 (coming soon!) only supports one install method.
@@ -239,6 +239,19 @@ function tunings(){
     chmod u-w $SETTINGS_FILE
 }
 
+function display_drupal_available_console_commands(){
+    echo "calling the $0 / ${FUNCNAME[0]}"
+    old_dir=$(pwd)
+
+    cd "${DRU_HOME}"
+    echo "1/ displaying the list of available drush commands:"
+    local_drush help 2>&1
+    echo "2/ displaying the list of available drupal console commands:"
+    local_drupal list 2>&1
+
+    cd $old_dir
+}
+
 function backup_instance(){
     echo "calling the $0 / ${FUNCNAME[0]}"
     archive_name="$(basename $DRUPAL_ARCHIVE)"
@@ -279,11 +292,12 @@ function main(){
     if [ $INSTALL_DATABASE == "True" ]; then
         mysql_database_creation
     fi
-    #kernel
-    #complementary_modules
-    #developper_modules
-    #personal_devs
-    #tunings
+    kernel
+    complementary_modules
+    developper_modules
+    personal_devs
+    tunings
+    display_drupal_available_console_commands
     backup_instance
 }
 
