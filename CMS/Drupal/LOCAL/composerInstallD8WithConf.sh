@@ -222,6 +222,43 @@ function personal_devs(){
 
 }
 
+function drupal_themings(){
+    echo "calling the  $0 / ${FUNCNAME[0]} function"
+
+    old_dir=$(pwd)
+
+    #Main Drupal8 frontend theme based on Bootstrap (comes with a Starter Kit)
+    BOOTSTRAP_THEME_DRUSH="bootstrap"
+    BOOTSTRAP_THEME_COMPOSER="drupal/${BOOTSTRAP_THEME_DRUSH}"
+
+    #lightweight backend theme 
+    ADMINIMAL_THEME_DRUSH="adminimal_theme"
+    ADMINIMAL_THEME_COMPOSER="drupal/${ADMINIMAL_THEME_DRUSH}"
+
+    cd "$DRU_SOURCES_DIR"
+
+    echo "+ we need ${BOOTSTRAP_THEME_DRUSH} (we download it using composer)"
+    local_composer require $BOOTSTRAP_THEME_COMPOSER 2>&1
+
+    echo "+ we need ${ADMINIMAL_THEME_DRUSH} (we download it using composer)"
+    local_composer require $ADMINIMAL_THEME_COMPOSER 2>&1
+
+    cd "$DRU_HOME"
+    
+    echo "+ we activate $BOOTSTRAP_THEME_DRUSH"
+    local_drush en -y $BOOTSTRAP_THEME_DRUSH 2>&1
+    echo "+ we define $BOOTSTRAP_THEME_DRUSH as the default frontend theme"
+    local_drush vset theme_default $BOOTSTRAP_THEME_DRUSH 2>&1 
+
+
+    echo "+ we activate $ADMINIMAL_THEME_DRUSH"
+    local_drush en -y $ADMINIMAL_THEME_DRUSH 2>&1
+    echo "+ we define $ADMINIMAL_THEME_DRUSH as the default backend theme"
+    local_drush vset admin_theme $ADMINIMAL_THEME_DRUSH 2>&1
+
+    cd $old_dir
+}
+
 function tunings(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
     SETTINGS_FILE="${DRU_HOME}/web/sites/default/settings.php"
@@ -294,6 +331,7 @@ function main(){
     fi
     kernel
     complementary_modules
+    drupal_themings
     developper_modules
     personal_devs
     tunings
