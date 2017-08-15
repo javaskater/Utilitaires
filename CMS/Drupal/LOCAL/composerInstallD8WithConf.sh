@@ -254,14 +254,20 @@ function drupal_themings(){
     
     echo "+ we activate $BOOTSTRAP_THEME_DRUSH"
     local_drush en -y $BOOTSTRAP_THEME_DRUSH 2>&1
-    echo "+ we define $BOOTSTRAP_THEME_DRUSH as the default frontend theme"
-    local_drush vset theme_default $BOOTSTRAP_THEME_DRUSH 2>&1 
-
-
     echo "+ we activate $ADMINIMAL_THEME_DRUSH"
     local_drush en -y $ADMINIMAL_THEME_DRUSH 2>&1
+
+    ## vset does not work in Drupal 8, instead we have to cchange the cconfiguration
+    ## defined at http://d8devextranet.ovh/admin/config/development/configuration/inspect/system.theme/raw
+    ## unsing drupal cconsole ...
+    cd "$DRU_SOURCES_DIR"
+    echo "+ we define $BOOTSTRAP_THEME_DRUSH as the default frontend theme"
+    local_drupal co system.theme default $BOOTSTRAP_THEME_DRUSH 2>&1
     echo "+ we define $ADMINIMAL_THEME_DRUSH as the default backend theme"
-    local_drush vset admin_theme $ADMINIMAL_THEME_DRUSH 2>&1
+    local_drupal co system.theme admin $ADMINIMAL_THEME_DRUSH 2>&1
+
+    cd "$DRU_HOME"
+    local_drush cr 2>&1
 
     cd $old_dir
 }
@@ -336,6 +342,7 @@ function backup_instance(){
 
 function main(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
+    old_dir=$(pwd)
     if [ $INSTALL_DATABASE == "True" ]; then
         mysql_database_creation
     fi
@@ -349,7 +356,9 @@ function main(){
     backup_instance
     sudo chown -R $USER:$APACHE $DRU_HOME 2>&1
     sudo chmod -R g+w $DRU_HOME 2>&1
+    cd "$DRU_HOME"
     local_drush cr 2>&1
+    cd $old_dir
 }
 
 main | tee $FLOG
