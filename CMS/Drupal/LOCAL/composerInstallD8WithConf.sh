@@ -3,7 +3,7 @@
 #The drush drupal8 installer drops by himself the database if exists
 ## Anyway if we need to create ti from scratch, just put true to the following variable
 INSTALL_DATABASE="True"
-
+LOCALE="fr"
 # On http://docs.drush.org/en/master/install/ they note that:
 ## Drush 9 (coming soon!) only supports one install method.
 ## It will require that your Drupal site be built with Composer
@@ -103,6 +103,50 @@ function kernel(){
     cd $old_dir
 }
 
+function add_another_language(){
+    newlang=$1 # must be fr or de or es see https://docs.drupalconsole.com/en/commands/locale-language-add.html
+    echo "calling the $0 / ${FUNCNAME[0]} function for adding ${newlang} to Drupal"
+    LOCALE_DRUSH="locale"
+	old_dir=$(pwd)
+	cd "${DRU_HOME}/web"
+	#In the case of an automatic installation this module is not active by default
+	echo " -- activating the $LOCALE_DRUSH module present but not activated by default"
+	local_drush en -y ${LOCALE_DRUSH} 2>&1
+	cd "$DRU_HOME"
+	echo " - adding the ${newlang} as Drupal interface language"
+	#see. https://docs.drupalconsole.com/en/commands/locale-language-add.html
+	local_drupal ${LOCALE_DRUSH}:language:add ${newlang} 2>&1
+    echo " - rebuilding the cache..."
+    cd "${DRU_HOME}/web"
+    local_drush cr 2>&1
+    cd ${old_dir}
+}
+
+function set_language_as_default(){
+    default_lang=$1 # must be fr or de or es see https://docs.drupalconsole.com/en/commands/locale-language-add.html
+    echo "calling the $0 / ${FUNCNAME[0]} function for setting ${default_lang} as the Drupal default language"
+	old_dir=$(pwd)
+	cd "$DRU_HOME"
+    echo " - settig ${newlang} as the default Drupal interface language"
+    local_drupal co system.site langcode ${default_lang} 2>&1
+    local_drupal co system.site default_langcode ${default_lang} 2>&1
+    echo " - rebuilding the cache..."
+    cd "${DRU_HOME}/web"
+    local_drush cr 2>&1
+    cd ${old_dir}
+}
+
+function update_interface_translations(){
+    echo "calling the $0 / ${FUNCNAME[0]} function"
+    LOCALE_DRUSH="locale"
+	old_dir=$(pwd)
+	cd "${DRU_HOME}/web"
+	local_drush locale-check 2>&1
+	local_drush locale-update 2>&1
+	local_drush cr
+    cd ${old_dir}
+}
+
 function complementary_modules(){
    echo "calling the  $0 / ${FUNCNAME[0]} function"
 
@@ -143,6 +187,10 @@ function developper_modules(){
    MASQUERADE_DRUSH="masquerade"
    MASQUERADE_COMPOSER="drupal/${MASQUERADE_DRUSH}"
 
+   #delete all users or all entities of a specific content type
+   DELETE_ALL_DRUSH="delete_all"
+   DELETE_ALL_COMPOSER="drupal/${DELETE_ALL_DRUSH}"
+
    #Developpers' tools suite ...
    DEVEL_DRUSH="devel"
    DEVEL_COMPOSER="drupal/${DEVEL_DRUSH}"
@@ -176,6 +224,9 @@ function developper_modules(){
    echo "+ we need $MASQUERADE_COMPOSER (we download it using composer)"
    local_composer require $MASQUERADE_COMPOSER 2>&1
 
+   echo "+ we need $DELETE_ALL_COMPOSER (we download it using composer)"
+   local_composer require $DELETE_ALL_COMPOSER 2>&1
+
    #you have to be under DRUPAL root to launch our drush commands
    cd "${DRU_HOME}"
 
@@ -196,6 +247,9 @@ function developper_modules(){
 
    echo "+ we activate $MASQUERADE_DRUSH (and its dependencies)"
    local_drush en -y $MASQUERADE_DRUSH 2>&1
+
+   echo "+ we activate $DELETE_ALL_DRUSH (and its dependencies)"
+   local_drush en -y $DELETE_ALL_DRUSH 2>&1
 
    cd $old_dir
 }
@@ -347,11 +401,14 @@ function main(){
         mysql_database_creation
     fi
     kernel
+    add_another_language ${LOCALE}
+    set_language_as_default ${LOCALE}
     complementary_modules
     drupal_themings
     developper_modules
     personal_devs
     tunings
+    update_interface_translations
     display_drupal_available_console_commands
     backup_instance
     sudo chown -R $USER:$APACHE $DRU_HOME 2>&1
