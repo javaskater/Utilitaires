@@ -112,16 +112,16 @@ function add_another_language(){
     echo "calling the $0 / ${FUNCNAME[0]} function for adding ${newlang} to Drupal"
     LOCALE_DRUSH="locale"
 	old_dir=$(pwd)
-	cd "${DRU_HOME}/web"
+	cd "${DRU_HOME}"
 	#In the case of an automatic installation this module is not active by default
 	echo " -- activating the $LOCALE_DRUSH module present but not activated by default"
 	local_drush en -y ${LOCALE_DRUSH} 2>&1
-	cd "$DRU_HOME"
+	cd "${DRU_SOURCES_DIR}"
 	echo " - adding the ${newlang} as Drupal interface language"
 	#see. https://docs.drupalconsole.com/en/commands/locale-language-add.html
 	local_drupal ${LOCALE_DRUSH}:language:add ${newlang} 2>&1
     echo " - rebuilding the cache..."
-    cd "${DRU_HOME}/web"
+    cd "${DRU_HOME}"
     local_drush cr 2>&1
     cd ${old_dir}
 }
@@ -130,12 +130,12 @@ function set_language_as_default(){
     default_lang=$1 # must be fr or de or es see https://docs.drupalconsole.com/en/commands/locale-language-add.html
     echo "calling the $0 / ${FUNCNAME[0]} function for setting ${default_lang} as the Drupal default language"
 	old_dir=$(pwd)
-	cd "$DRU_HOME"
+	cd "$DRU_SOURCES_DIR"
     echo " - settig ${newlang} as the default Drupal interface language"
     local_drupal co system.site langcode ${default_lang} 2>&1
     local_drupal co system.site default_langcode ${default_lang} 2>&1
     echo " - rebuilding the cache..."
-    cd "${DRU_HOME}/web"
+    cd "${DRU_HOME}"
     local_drush cr 2>&1
     cd ${old_dir}
 }
@@ -144,7 +144,7 @@ function update_interface_translations(){
     echo "calling the $0 / ${FUNCNAME[0]} function"
     LOCALE_DRUSH="locale"
 	old_dir=$(pwd)
-	cd "${DRU_HOME}/web"
+	cd "${DRU_HOME}"
 	local_drush locale-check 2>&1
 	local_drush locale-update 2>&1
 	local_drush cr
