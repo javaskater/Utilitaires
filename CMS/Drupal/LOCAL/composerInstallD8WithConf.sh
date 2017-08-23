@@ -293,6 +293,10 @@ function drupal_themings(){
     BOOTSTRAP_THEME_COMPOSER="drupal/${BOOTSTRAP_THEME_DRUSH}"
 
     #lightweight backend theme 
+    ## To avoid conflict between the default admin toolbar and the adminimal admin toolbar we need the followinc module
+    ### see. explanations on https://www.drupal.org/project/adminimal_admin_toolbar 
+    ADMINIMAL_TOOLBAR_DRUSH="adminimal_admin_toolbar"
+    ADMINIMAL_TOOLBAR_COMPOSER="drupal/${ADMINIMAL_TOOLBAR_DRUSH}"
     ADMINIMAL_THEME_DRUSH="adminimal_theme"
     ADMINIMAL_THEME_COMPOSER="drupal/${ADMINIMAL_THEME_DRUSH}"
 
@@ -301,6 +305,9 @@ function drupal_themings(){
     echo "+ we need ${BOOTSTRAP_THEME_DRUSH} (we download it using composer)"
     local_composer require $BOOTSTRAP_THEME_COMPOSER 2>&1
 
+
+    echo "+ we need ${ADMINIMAL_TOOLBAR_DRUSH} (we download it using composer)"
+    local_composer require $ADMINIMAL_TOOLBAR_COMPOSER 2>&1
     echo "+ we need ${ADMINIMAL_THEME_DRUSH} (we download it using composer)"
     local_composer require $ADMINIMAL_THEME_COMPOSER 2>&1
 
@@ -310,6 +317,8 @@ function drupal_themings(){
     local_drush en -y $BOOTSTRAP_THEME_DRUSH 2>&1
     echo "+ we activate $ADMINIMAL_THEME_DRUSH"
     local_drush en -y $ADMINIMAL_THEME_DRUSH 2>&1
+    echo "+ we activate $ADMINIMAL_TOOLBAR_DRUSH"
+    local_drush en -y $ADMINIMAL_TOOLBAR_DRUSH 2>&1
 
     ## vset does not work in Drupal 8, instead we have to cchange the cconfiguration
     ## defined at http://d8devextranet.ovh/admin/config/development/configuration/inspect/system.theme/raw
