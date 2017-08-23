@@ -87,8 +87,12 @@ function kernel(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
     old_dir=$(pwd)
 
+    if [ -d "$DRU_SOURCES_DIR" ]; then
+    	echo "+ ${DRU_SOURCES_DIR} exists (prvious installation), we supress those old sources before getting the new ones"
+        sudo rm -rf $DRU_SOURCES_DIR
+    fi
+    
     echo "We install the latest Drupal8 sources unser ${DRU_SOURCES_DIR} unsig composer"
-    sudo rm -rf $DRU_SOURCES_DIR
     cd $DRU_INSTALL_DIR
     local_composer create-project drupal-composer/drupal-project:8.x-dev $DRU_INSTANCE --stability dev --no-interaction 2>&1
     echo "we now launch Drupal automatic installation using the local drush present in the vendor directory"
