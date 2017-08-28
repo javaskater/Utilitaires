@@ -287,6 +287,25 @@ function personal_devs(){
 
 }
 
+
+#the kernel search module makes Drupal wuse intesively the Database
+#for our dev environment we need to deactivate it .
+function search_deactivate(){
+    echo "calling the  $0 / ${FUNCNAME[0]} function"
+
+    old_dir=$(pwd)
+
+    #the kernel search module
+    SEARCH_DRUSH="search"
+
+    #you have to be under DRUPAL root to launch our drush commands
+    cd "$DRU_HOME"
+    local_drush pm-uninstall -y $SEARCH_DRUSH 2>&1
+
+    cd $old_dir
+
+}
+
 function drupal_themings(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
 
@@ -414,6 +433,7 @@ function main(){
         mysql_database_creation
     fi
     kernel
+    search_deactivate
     add_another_language ${LOCALE}
     set_language_as_default ${LOCALE}
     complementary_modules
