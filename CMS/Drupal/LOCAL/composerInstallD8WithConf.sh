@@ -269,19 +269,37 @@ function personal_devs(){
     DELETE_ALL_DRUSH="delete_all"
     DELETE_ALL_COMPOSER="drupal/${DELETE_ALL_DRUSH}"
 
+
+    #my module need the following  one that I have to download via composer before enabling the whole
+    FEATURES_DRUSH="features"
+    FEATURES_UI_DRUSH="${FEATURES_DRUSH}_ui"
+    FEATURES_COMPOSER="drupal/${FEATURES_DRUSH}"
+
     cd "$DRU_SOURCES_DIR"
 
     echo "+ we need ${DELETE_ALL_DRUSH} (we download it using composer)"
     local_composer require $DELETE_ALL_COMPOSER 2>&1
 
+    echo "+ we need ${FEATURES_DRUSH} (we download it using composer)"
+    local_composer require $FEATURES_COMPOSER 2>&1
+    
+
     GIT_IMPORT_MODULE="https://github.com/javaskater/${IMPORT_MODULE}.git"
     echo "+ we clone $GIT_IMPORT_MODULE into $DRU_PERSONAL_MODULES"
     mkdir $DRU_PERSONAL_MODULES && cd $DRU_PERSONAL_MODULES
     git clone $GIT_IMPORT_MODULE 2>&1
-    echo "+ we activate $IMPORT_MODULE and its dependencies (configuration modules)"
+    
     #you have to be under DRUPAL root to launch our drush commands
     cd "$DRU_HOME"
+    echo "+ we then activate ${DELETE_ALL_DRUSH} using drush"
+    local_drush en -y $DELETE_ALL_DRUSH 2>&1
+    echo "+ we activate $IMPORT_MODULE and its dependencies (configuration modules)"
     local_drush en -y $IMPORT_MODULE 2>&1
+    echo "+ we then activate ${FEATURES_DRUSH} using drush"
+    local_drush en -y $FEATURES_DRUSH 2>&1
+    echo "+ we then activate ${FEATURES_UI_DRUSH} using drush"
+    local_drush en -y $FEATURES_UI_DRUSH 2>&1
+
 
     cd $old_dir
 
