@@ -265,15 +265,7 @@ function personal_devs(){
 
     IMPORT_MODULE="rif_imports"
 
-    #my module need the following  one that I have to download via composer before enabling the whole
-    DELETE_ALL_DRUSH="delete_all"
-    DELETE_ALL_COMPOSER="drupal/${DELETE_ALL_DRUSH}"
-
     cd "$DRU_SOURCES_DIR"
-
-    echo "+ we need ${DELETE_ALL_DRUSH} (we download it using composer)"
-    local_composer require $DELETE_ALL_COMPOSER 2>&1
-    
 
     GIT_IMPORT_MODULE="https://github.com/javaskater/${IMPORT_MODULE}.git"
     echo "+ we clone $GIT_IMPORT_MODULE into $DRU_PERSONAL_MODULES"
@@ -282,10 +274,8 @@ function personal_devs(){
     
     #you have to be under DRUPAL root to launch our drush commands
     cd "$DRU_HOME"
-    echo "+ we then activate ${DELETE_ALL_DRUSH} using drush"
-    local_drush en -y $DELETE_ALL_DRUSH 2>&1
     echo "+ we activate $IMPORT_MODULE and its dependencies (configuration modules)"
-    local_drush en -y $IMPORT_MODULE 2>&1
+    #local_drush en -y $IMPORT_MODULE 2>&1
 
     cd $old_dir
 }
@@ -390,7 +380,7 @@ function drupal_themings(){
 
 function tunings(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
-    SETTINGS_FILE="${DRU_HOME}/web/sites/default/settings.php"
+    SETTINGS_FILE="${DRU_HOME}/sites/default/settings.php"
     chmod u+w $SETTINGS_FILE
     echo "" >> $SETTINGS_FILE
     echo "/* " >> $SETTINGS_FILE
@@ -459,26 +449,27 @@ function backup_instance(){
 function main(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
     old_dir=$(pwd)
-    if [ $INSTALL_DATABASE == "True" ]; then
+    if [ $INSTALL_DATABASE == "True1" ]; then
         mysql_database_creation
     fi
-    kernel
-    search_deactivate
-    add_another_language ${LOCALE}
-    set_language_as_default ${LOCALE}
-    complementary_modules
-    drupal_themings
-    developper_modules
+    #kernel
+    #search_deactivate
+    #add_another_language ${LOCALE}
+    #set_language_as_default ${LOCALE}
+    #complementary_modules
+    #drupal_themings
+    #developper_modules
     personal_devs
-    featuring
-    tunings
-    update_interface_translations
-    display_drupal_available_console_commands
-    backup_instance
-    sudo chown -R $USER:$APACHE $DRU_HOME 2>&1
-    sudo chmod -R g+w $DRU_HOME 2>&1
+    #featuring
+    #tunings
+    #update_interface_translations
+    #display_drupal_available_console_commands
+    # backuping starts by rebuilding cache
+    #backup_instance
     cd "$DRU_HOME"
     local_drush cr 2>&1
+    sudo chown -R $USER:$APACHE $DRU_HOME 2>&1
+    sudo chmod -R g+w $DRU_HOME 2>&1
     cd $old_dir
 }
 
