@@ -29,7 +29,7 @@ DRU_PERSONAL_MODULES="${DRU_HOME}/modules/custom"
 
 DRU_THEMES="${DRU_HOME}/themes"
 
-#paramètres demandés par le script d'installation de Drupal
+# parameters required by the Drupal installation script
 ADMIN_PASSWD="admin"
 SITE_NAME="Randonneurs Ile de France"
 
@@ -39,7 +39,7 @@ SITE_NAME="Randonneurs Ile de France"
 #PRIVATE_FILE_IMAGE_PATH="$HOME/Images/RIF"
 ## The Proxy server for Drupal to access internet (updates, localisation updates, adding module through GUI)
 ### uncomment the following variable (and change for the right parameters) if your Drupal installation stays behind such a proxy server
-#PROXY="http://monproxy:monport"
+#PROXY="http://myproxy:myport"
 
 MYSQL_ROOT="root"
 MYSQL_ROOTPASSWD="root"
