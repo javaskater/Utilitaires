@@ -33,11 +33,13 @@ DRU_THEMES="${DRU_HOME}/themes"
 ADMIN_PASSWD="admin"
 SITE_NAME="Randonneurs Ile de France"
 
-#paramétrages présents dans le fichier setings.php
-##le chemin d'accès aux fichiers plats doit être accessible rwx par www-data
-PRIVATE_FILE_IMAGE_PATH="$HOME/Images/RIF"
-##le proxy DGFIP qui permet à Drupal d'accéder à internet (mises à jour, installation de modules par l'interface graphique ?)
-PROXY="http://monproxy:monport"
+# Adding parameters to the default settings.php file
+## the path to the private files/medias must be  rwx for www-data
+### uncomment the following variable if you put your images/files in a private location (not public like default)
+#PRIVATE_FILE_IMAGE_PATH="$HOME/Images/RIF"
+## The Proxy server for Drupal to access internet (updates, localisation updates, adding module through GUI)
+### uncomment the following variable (and change for the right parameters) if your Drupal installation stays behind such a proxy server
+#PROXY="http://monproxy:monport"
 
 MYSQL_ROOT="root"
 MYSQL_ROOTPASSWD="root"
@@ -146,7 +148,7 @@ function update_interface_translations(){
 	old_dir=$(pwd)
 	cd "${DRU_HOME}"
 	local_drush locale-check 2>&1
-	local_drush locale-update 2>&1
+	local_drush locale-- 2>&1
 	local_drush cr
     cd ${old_dir}
 }
@@ -275,7 +277,7 @@ function personal_devs(){
     #you have to be under DRUPAL root to launch our drush commands
     cd "$DRU_HOME"
     echo "+ we activate $IMPORT_MODULE and its dependencies (configuration modules)"
-    #local_drush en -y $IMPORT_MODULE 2>&1
+    local_drush en -y $IMPORT_MODULE 2>&1
 
     cd $old_dir
 }
@@ -387,11 +389,17 @@ function tunings(){
     echo "* paramètres ajoutés par la fonction ${FUNCNAME[0]} du script $0" >> $SETTINGS_FILE
     echo "*/" >> $SETTINGS_FILE
     #We don't want our attached file be in the public directory by default see  de https://www.drupal.org/node/2392959 (bottom of the webpage)
-    echo "\$settings['file_private_path'] = '${PRIVATE_FILE_IMAGE_PATH}';" >> $SETTINGS_FILE
+    if [ -n "${PRIVATE_FILE_IMAGE_PATH}" ]
+    then
+        echo "\$settings['file_private_path'] = '${PRIVATE_FILE_IMAGE_PATH}';" >> $SETTINGS_FILE
+    fi
     #If Drupal has to access internet through a proxy server, wee need to add its address here ....
-    echo "\$settings['http_client_config']['proxy']['http'] = '${PROXY}';" >> $SETTINGS_FILE
-    echo "\$settings['http_client_config']['proxy']['https'] = '${PROXY}';" >> $SETTINGS_FILE
-    echo "\$settings['http_client_config']['proxy']['no'] = ['127.0.0.1', 'localhost', '*.dgfip'];" >> $SETTINGS_FILE
+    if [ -n "${PROXY}" ]
+    then
+        echo "\$settings['http_client_config']['proxy']['http'] = '${PROXY}';" >> $SETTINGS_FILE
+        echo "\$settings['http_client_config']['proxy']['https'] = '${PROXY}';" >> $SETTINGS_FILE
+        echo "\$settings['http_client_config']['proxy']['no'] = ['127.0.0.1', 'localhost', '*.dgfip'];" >> $SETTINGS_FILE
+    fi
     chmod u-w $SETTINGS_FILE
 }
 
@@ -449,23 +457,23 @@ function backup_instance(){
 function main(){
     echo "calling the  $0 / ${FUNCNAME[0]} function"
     old_dir=$(pwd)
-    if [ $INSTALL_DATABASE == "True1" ]; then
+    if [ $INSTALL_DATABASE == "True" ]; then
         mysql_database_creation
     fi
-    #kernel
-    #search_deactivate
-    #add_another_language ${LOCALE}
-    #set_language_as_default ${LOCALE}
-    #complementary_modules
-    #drupal_themings
-    #developper_modules
+    kernel
+    search_deactivate
+    add_another_language ${LOCALE}
+    set_language_as_default ${LOCALE}
+    complementary_modules
+    drupal_themings
+    developper_modules
     personal_devs
-    #featuring
-    #tunings
-    #update_interface_translations
-    #display_drupal_available_console_commands
-    # backuping starts by rebuilding cache
-    #backup_instance
+    featuring
+    tunings
+    update_interface_translations
+    display_drupal_available_console_commands
+    backuping starts by rebuilding cache
+    backup_instance
     cd "$DRU_HOME"
     local_drush cr 2>&1
     sudo chown -R $USER:$APACHE $DRU_HOME 2>&1
