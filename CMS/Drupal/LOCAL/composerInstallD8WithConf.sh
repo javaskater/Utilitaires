@@ -39,7 +39,7 @@ SITE_NAME="Randonneurs Ile de France"
 #PRIVATE_FILE_IMAGE_PATH="$HOME/Images/RIF"
 ## The Proxy server for Drupal to access internet (updates, localisation updates, adding module through GUI)
 ### uncomment the following variable (and change for the right parameters) if your Drupal installation stays behind such a proxy server
-#PROXY="http://myproxy:myport"
+#PROXY="http://proxy.mycompany:itsport"
 
 MYSQL_ROOT="root"
 MYSQL_ROOTPASSWD="root"
@@ -47,8 +47,8 @@ MYSQL_DATABASE=$DRU_INSTANCE
 
 DIR=${PWD%/}
 DAT=$(date +%Y%m%d_%H%M%S)
-FLOG=$DIR/${DRU_INSTANCE}-$DAT.log
-DRUPAL_ARCHIVE=${DRU_INSTALL_DIR}/"${DRU_INSTANCE}-${DAT}"
+FLOG="$DIR/${DRU_INSTANCE}-$DAT.log"
+DRUPAL_ARCHIVE="${DRU_INSTALL_DIR}/${DRU_INSTANCE}-${DAT}"
 
 #for aliases definiton we need...
 
@@ -148,7 +148,7 @@ function update_interface_translations(){
 	old_dir=$(pwd)
 	cd "${DRU_HOME}"
 	local_drush locale-check 2>&1
-	local_drush locale-- 2>&1
+	local_drush locale-update 2>&1
 	local_drush cr
     cd ${old_dir}
 }
@@ -472,7 +472,6 @@ function main(){
     tunings
     update_interface_translations
     display_drupal_available_console_commands
-    backuping starts by rebuilding cache
     backup_instance
     cd "$DRU_HOME"
     local_drush cr 2>&1
