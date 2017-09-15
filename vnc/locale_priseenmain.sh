@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-export Host="IP Box Sabalos"
-export Port="PortSSH"
-export User="userSabalos"
+export Host="192.168.1.XX"
+export Port="postSSH"
+export User="USerMaison"
 export IdentityFile="$HOME/.ssh/id_dsa"
 
 demarrer_xvnc_server(){
@@ -15,14 +15,8 @@ se_connecter_en_mode_console(){
 	ssh -i $IdentityFile -o PubkeyAcceptedKeyTypes=+ssh-dss $User@$Host -p $Port
 }
 
-demarrer_le_client(){
-	gnome-terminal -x bash -c "ssh -p 9222 -X -L 5900:localhost:5900 -o PubkeyAcceptedKeyTypes=+ssh-dss ${Host}"
-	sleep 5
-	#ce doit être le Host et le numéro de Display (Le serveur nous indique 0)
-	## le port est 5900 et ne doit pas être utilisé par un serveur localhost
-	### pour savoir qui l'utilise lsof -ti:5900
-	#téléchargés de Drive les fichiers passwd ne sont plus cachés
-	vncviewer -passwd ~/vnc_passwd_${User} localhost:0
+demarrer_le_client(){ #ce doit être le Host et le numéro de Display
+	vncviewer -passwd ~/vnc_passwd_${User} ${Host}:0 #téléchargés de Drive les fichiers passwd ne sont plus cachés
 }
 
 main(){
