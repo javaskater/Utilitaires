@@ -1,11 +1,14 @@
-# About the [Drupal 8](https://www.drupal.org/8) loccal scripts
+# About the [Drupal 8](https://www.drupal.org/8) local scripts
 
 ## Before launching _composerInstallD8WithConf.sh_
 
 * __composerInstallD8WithConf.sh__ is meant to install the latest version of a [Drupal 8](https://www.drupal.org/8) 
-  * ready to import the hikes and users from the CSVs files exported from the RIF's managing application. 
+  * ready to import the hikes and users from the CSVs files exported from the [RIF](http://rifrando.fr/)'s managing application. 
 
 ### [Install locally composer](https://getcomposer.org/download/) on your $HOME directory!!!
+
+* Following that [link for installing locally composer](https://getcomposer.org/download/)
+* I pass the following commands from my _$HOME_ directory:
 
 ```bash
 jpmena@jpmena-P34:~$ php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
