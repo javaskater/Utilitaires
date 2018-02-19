@@ -1,0 +1,15 @@
+{
+  "name": "gulpmdtoblog",
+  "version": "0.0.1",
+  "description": "Translate MD Files to HTML using GULP",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-markdown-it": "^0.1.1"
+  }
+}
